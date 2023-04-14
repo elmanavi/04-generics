@@ -3,6 +3,7 @@ package ohm.softa.a04.tests;
 import ohm.softa.a04.SimpleFilter;
 import ohm.softa.a04.SimpleList;
 import ohm.softa.a04.SimpleListImpl;
+import ohm.softa.a04.tests.models.Person;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,11 +19,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class SimpleListTests {
 
 	private final Logger logger = LogManager.getLogger();
-	private SimpleList testList;
+	private SimpleList<Integer> testList;
 
 	@BeforeEach
 	void setup(){
-		testList = new SimpleListImpl();
+		testList = new SimpleListImpl<Integer>();
 
 		testList.add(1);
 		testList.add(2);
@@ -50,16 +51,14 @@ public class SimpleListTests {
 	@Test
 	void testFilterAnonymousClass(){
 		logger.info("Testing the filter possibilities by filtering for all elements greater 2");
-		SimpleList result = testList.filter(new SimpleFilter() {
+		SimpleList<Integer> result = testList.filter(new SimpleFilter<Integer>() {
 			@Override
-			public boolean include(Object item) {
-				int current = (int)item;
-				return current > 2;
+			public boolean include(Integer item) {
+				return item	 > 2;
 			}
 		});
 
-		for(Object o : result){
-			int i = (int)o;
+		for(Integer i : result){
 			assertTrue(i > 2);
 		}
 	}
@@ -67,10 +66,26 @@ public class SimpleListTests {
 	@Test
 	void testFilterLambda(){
 		logger.info("Testing the filter possibilities by filtering for all elements which are dividable by 2");
-		SimpleList result = testList.filter(o -> ((int) o) % 2 == 0);
-		for(Object o : result){
-			int i = (int)o;
+		SimpleList<Integer> result = testList.filter(o -> ((int) o) % 2 == 0);
+		for(Integer i : result){
 			assertTrue(i % 2 == 0);
 		}
+	}
+
+	@Test
+	void testMap(){
+		logger.info("Testing the map possibilities by mapping all elements from an integer list to a string list");
+		SimpleList<String> result = testList.map(o -> o.toString());
+		for(Object o : result){
+			assertTrue(o instanceof String );
+		}
+	}
+
+	@Test
+	void testAddEmpty() throws Exception {
+		logger.info("Testing to add a new empty list element");
+		SimpleList<Person> l = new SimpleListImpl<>();
+		l.addDefault(Person.class);
+		assertEquals(1, l.size());
 	}
 }
